@@ -16,7 +16,7 @@ type Record struct {
 	Ttl     string `json:"ttl"`
 }
 
-func GetRecords(auth *auth, zone Zone) ([]Record, error) {
+func GetRecords(auth *auth, zone Domain) ([]Record, error) {
 	res, err := SendRequest("GET", "http://dozens.jp/api/record/"+zone.Name+".json", "", auth)
 	if err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func GetRecords(auth *auth, zone Zone) ([]Record, error) {
 	return parseRecordListResponse(res)
 }
 
-func AddRecord(auth *auth, zone Zone, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
+func AddRecord(auth *auth, zone Domain, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
 	req, err := json.Marshal(map[string]string{"domain": zone.Name, "name": name, "type": typ, "prio": prio, "content": content, "ttl": ttl})
 	if err != nil {
 		return nil, err

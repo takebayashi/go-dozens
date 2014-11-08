@@ -19,8 +19,8 @@ func NewClient(client *http.Client, user string, key string) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) ListDomains() ([]Zone, error) {
-	return GetZones(c.auth)
+func (c *Client) ListDomains() ([]Domain, error) {
+	return GetDomains(c.auth)
 }
 
 func (c *Client) sendRequest(method string, uri string, body string) (*http.Response, error) {

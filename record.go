@@ -16,28 +16,28 @@ type Record struct {
 	Ttl     string `json:"ttl"`
 }
 
-func GetRecords(token string, zone Zone) ([]Record, error) {
-	res, err := SendRequest("GET", "http://dozens.jp/api/record/"+zone.Name+".json", "", token)
+func GetRecords(auth *auth, zone Zone) ([]Record, error) {
+	res, err := SendRequest("GET", "http://dozens.jp/api/record/"+zone.Name+".json", "", auth)
 	if err != nil {
 		return nil, err
 	}
 	return parseRecordListResponse(res)
 }
 
-func AddRecord(token string, zone Zone, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
+func AddRecord(auth *auth, zone Zone, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
 	req, err := json.Marshal(map[string]string{"domain": zone.Name, "name": name, "type": typ, "prio": prio, "content": content, "ttl": ttl})
 	if err != nil {
 		return nil, err
 	}
-	res, err := SendRequest("POST", "http://dozens.jp/api/record/create.json", string(req), token)
+	res, err := SendRequest("POST", "http://dozens.jp/api/record/create.json", string(req), auth)
 	if err != nil {
 		return nil, err
 	}
 	return parseRecordListResponse(res)
 }
 
-func DeleteRecord(token string, record Record) ([]Record, error) {
-  res, err := SendRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "", token)
+func DeleteRecord(auth *auth, record Record) ([]Record, error) {
+  res, err := SendRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "", auth)
 	if err != nil {
 		return nil, err
 	}

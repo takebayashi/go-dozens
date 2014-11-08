@@ -12,28 +12,28 @@ type Zone struct {
 	Name string `json:"name"`
 }
 
-func GetZones(token string) ([]Zone, error) {
-	res, err := SendRequest("GET", "http://dozens.jp/api/zone.json", "", token)
+func GetZones(auth *auth) ([]Zone, error) {
+	res, err := SendRequest("GET", "http://dozens.jp/api/zone.json", "", auth)
 	if err != nil {
 		return nil, err
 	}
 	return parseZoneListResponse(res)
 }
 
-func AddZone(token string, name string, mail string) ([]Zone, error) {
+func AddZone(auth *auth, name string, mail string) ([]Zone, error) {
 	reqBody, err := json.Marshal(map[string]string{"name": name, "mailaddress": mail})
 	if err != nil {
 		return nil, err
 	}
-	res, err := SendRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody), token)
+	res, err := SendRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody), auth)
 	if err != nil {
 		return nil, err
 	}
 	return parseZoneListResponse(res)
 }
 
-func DeleteZone(token string, zone Zone) ([]Zone, error) {
-	res, err := SendRequest("DELETE", "http://dozens.jp/api/zone/delete/"+zone.Id+".json", "", token)
+func DeleteZone(auth *auth, zone Zone) ([]Zone, error) {
+	res, err := SendRequest("DELETE", "http://dozens.jp/api/zone/delete/"+zone.Id+".json", "", auth)
 	if err != nil {
 		return nil, err
 	}

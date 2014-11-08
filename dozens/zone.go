@@ -1,4 +1,4 @@
-package main
+package dozens
 
 import (
 	"encoding/json"

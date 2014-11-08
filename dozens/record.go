@@ -1,4 +1,4 @@
-package main
+package dozens
 
 import (
 	"encoding/json"
@@ -37,7 +37,7 @@ func AddRecord(auth *auth, zone Zone, name string, typ string, prio string, cont
 }
 
 func DeleteRecord(auth *auth, record Record) ([]Record, error) {
-  res, err := SendRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "", auth)
+	res, err := SendRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "", auth)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ type Domain struct {
 	Name string `json:"name"`
 }
 
-func (c *Client) ListDomains() ([]Domain, error) {
+func (c *Client) ListDomains() ([]*Domain, error) {
 	res, err := c.sendRequest("GET", "http://dozens.jp/api/zone.json", "")
 	if err != nil {
 		return nil, err
@@ -20,21 +20,20 @@ func (c *Client) ListDomains() ([]Domain, error) {
 	return parseDomainListResponse(res)
 }
 
-func (c *Client) GetDomain(name string) (Domain, error) {
-	var domain Domain
+func (c *Client) GetDomain(name string) (*Domain, error) {
 	list, err := c.ListDomains()
 	if err != nil {
-		return domain, err
+		return nil, err
 	}
 	for _, d := range list {
 		if d.Name == name {
-			domain = d
+			return d, nil
 		}
 	}
-	return domain, errors.New("Not Found")
+	return nil, errors.New("Not Found")
 }
 
-func (c *Client) AddDomain(name string, mail string) ([]Domain, error) {
+func (c *Client) AddDomain(name string, mail string) ([]*Domain, error) {
 	reqBody, err := json.Marshal(map[string]string{"name": name, "mailaddress": mail})
 	if err != nil {
 		return nil, err
@@ -46,7 +45,7 @@ func (c *Client) AddDomain(name string, mail string) ([]Domain, error) {
 	return parseDomainListResponse(res)
 }
 
-func (c *Client) DeleteDomain(zone Domain) ([]Domain, error) {
+func (c *Client) DeleteDomain(zone Domain) ([]*Domain, error) {
 	res, err := c.sendRequest("DELETE", "http://dozens.jp/api/zone/delete/"+zone.Id+".json", "")
 	if err != nil {
 		return nil, err
@@ -54,7 +53,7 @@ func (c *Client) DeleteDomain(zone Domain) ([]Domain, error) {
 	return parseDomainListResponse(res)
 }
 
-func parseDomainListResponse(res *http.Response) ([]Domain, error) {
+func parseDomainListResponse(res *http.Response) ([]*Domain, error) {
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -62,7 +61,7 @@ func parseDomainListResponse(res *http.Response) ([]Domain, error) {
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New(string(resBody))
 	}
-	var zones map[string][]Domain
+	var zones map[string][]*Domain
 	json.Unmarshal(resBody, &zones)
 	return zones["domain"], nil
 }

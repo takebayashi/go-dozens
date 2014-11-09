@@ -12,28 +12,28 @@ type Domain struct {
 	Name string `json:"name"`
 }
 
-func GetDomains(auth *auth) ([]Domain, error) {
-	res, err := SendRequest("GET", "http://dozens.jp/api/zone.json", "", auth)
+func (c *Client) ListDomains() ([]Domain, error) {
+	res, err := c.sendRequest("GET", "http://dozens.jp/api/zone.json", "")
 	if err != nil {
 		return nil, err
 	}
 	return parseDomainListResponse(res)
 }
 
-func AddDomain(auth *auth, name string, mail string) ([]Domain, error) {
+func (c *Client) AddDomain(name string, mail string) ([]Domain, error) {
 	reqBody, err := json.Marshal(map[string]string{"name": name, "mailaddress": mail})
 	if err != nil {
 		return nil, err
 	}
-	res, err := SendRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody), auth)
+	res, err := c.sendRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody))
 	if err != nil {
 		return nil, err
 	}
 	return parseDomainListResponse(res)
 }
 
-func DeleteDomain(auth *auth, zone Domain) ([]Domain, error) {
-	res, err := SendRequest("DELETE", "http://dozens.jp/api/zone/delete/"+zone.Id+".json", "", auth)
+func (c *Client) DeleteDomain(zone Domain) ([]Domain, error) {
+	res, err := c.sendRequest("DELETE", "http://dozens.jp/api/zone/delete/"+zone.Id+".json", "")
 	if err != nil {
 		return nil, err
 	}

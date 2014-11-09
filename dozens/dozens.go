@@ -19,17 +19,6 @@ func NewClient(client *http.Client, user string, key string) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) sendRequest(method string, uri string, body string) (*http.Response, error) {
-	req, err := http.NewRequest(method, uri, strings.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Auth-Token", c.auth.AuthToken)
-	res, err := c.httpClient.Do(req)
-	return res, err
-}
-
 func (c *Client) newRequest(method string, uri string, body string) (*http.Request, error) {
 	req, err := http.NewRequest(method, uri, strings.NewReader(body))
 	if err != nil {

@@ -20,6 +20,20 @@ func (c *Client) ListDomains() ([]Domain, error) {
 	return parseDomainListResponse(res)
 }
 
+func (c *Client) GetDomain(name string) (Domain, error) {
+	var domain Domain
+	list, err := c.ListDomains()
+	if err != nil {
+		return domain, err
+	}
+	for _, d := range list {
+		if d.Name == name {
+			domain = d
+		}
+	}
+	return domain, errors.New("Not Found")
+}
+
 func (c *Client) AddDomain(name string, mail string) ([]Domain, error) {
 	reqBody, err := json.Marshal(map[string]string{"name": name, "mailaddress": mail})
 	if err != nil {

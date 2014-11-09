@@ -1,6 +1,6 @@
 package main
 
-// simply show domains listed in dozens.jp
+// simply show domains and records listed in dozens.jp
 
 import (
 	"fmt"
@@ -15,12 +15,22 @@ func main() {
 	client, err := dozens.NewClient(&http.Client{}, user, key)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	domains, err := client.ListDomains()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-	for _, d := range domains {
-		fmt.Println(d.Name)
+	for di, d := range domains {
+		fmt.Printf("Domain #%02d: %s\n", di, d.Name)
+		records, err := client.ListRecords(d)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		for ri, r := range records {
+			fmt.Printf("\tRecord #%02d: %s %s %s\n", ri, r.Type, r.Name, r.Content)
+		}
 	}
 }

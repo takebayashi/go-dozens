@@ -16,28 +16,28 @@ type Record struct {
 	Ttl     string `json:"ttl"`
 }
 
-func GetRecords(auth *auth, zone Domain) ([]Record, error) {
-	res, err := SendRequest("GET", "http://dozens.jp/api/record/"+zone.Name+".json", "", auth)
+func (c *Client) ListRecords(zone Domain) ([]Record, error) {
+	res, err := c.sendRequest("GET", "http://dozens.jp/api/record/"+zone.Name+".json", "")
 	if err != nil {
 		return nil, err
 	}
 	return parseRecordListResponse(res)
 }
 
-func AddRecord(auth *auth, zone Domain, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
+func (c *Client) AddRecord(auth *auth, zone Domain, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
 	req, err := json.Marshal(map[string]string{"domain": zone.Name, "name": name, "type": typ, "prio": prio, "content": content, "ttl": ttl})
 	if err != nil {
 		return nil, err
 	}
-	res, err := SendRequest("POST", "http://dozens.jp/api/record/create.json", string(req), auth)
+	res, err := c.sendRequest("POST", "http://dozens.jp/api/record/create.json", string(req))
 	if err != nil {
 		return nil, err
 	}
 	return parseRecordListResponse(res)
 }
 
-func DeleteRecord(auth *auth, record Record) ([]Record, error) {
-	res, err := SendRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "", auth)
+func (c *Client) DeleteRecord(record Record) ([]Record, error) {
+	res, err := c.sendRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "")
 	if err != nil {
 		return nil, err
 	}

@@ -13,11 +13,11 @@ type Domain struct {
 }
 
 func (c *Client) ListDomains() ([]*Domain, error) {
-	res, err := c.sendRequest("GET", "http://dozens.jp/api/zone.json", "")
+	req, err := c.newRequest("GET", "http://dozens.jp/api/zone.json", "")
 	if err != nil {
 		return nil, err
 	}
-	return parseDomainListResponse(res)
+	return c.fetchDomainList(req)
 }
 
 func (c *Client) GetDomain(name string) (*Domain, error) {
@@ -33,27 +33,31 @@ func (c *Client) GetDomain(name string) (*Domain, error) {
 	return nil, errors.New("Not Found")
 }
 
-func (c *Client) AddDomain(name string, mail string) ([]*Domain, error) {
-	reqBody, err := json.Marshal(map[string]string{"name": name, "mailaddress": mail})
+func (c *Client) AddDomain(domain *Domain, mail string) ([]*Domain, error) {
+	reqBody, err := json.Marshal(map[string]string{"name": domain.Name, "mailaddress": mail})
 	if err != nil {
 		return nil, err
 	}
-	res, err := c.sendRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody))
+	req, err := c.newRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody))
 	if err != nil {
 		return nil, err
 	}
-	return parseDomainListResponse(res)
+	return c.fetchDomainList(req)
 }
 
-func (c *Client) DeleteDomain(zone Domain) ([]*Domain, error) {
-	res, err := c.sendRequest("DELETE", "http://dozens.jp/api/zone/delete/"+zone.Id+".json", "")
+func (c *Client) DeleteDomain(domain *Domain) ([]*Domain, error) {
+	req, err := c.newRequest("DELETE", "http://dozens.jp/api/zone/delete/"+domain.Id+".json", "")
 	if err != nil {
 		return nil, err
 	}
-	return parseDomainListResponse(res)
+	return c.fetchDomainList(req)
 }
 
-func parseDomainListResponse(res *http.Response) ([]*Domain, error) {
+func (c *Client) fetchDomainList(req *http.Request) ([]*Domain, error) {
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	resBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -61,7 +65,7 @@ func parseDomainListResponse(res *http.Response) ([]*Domain, error) {
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New(string(resBody))
 	}
-	var zones map[string][]*Domain
-	json.Unmarshal(resBody, &zones)
-	return zones["domain"], nil
+	var result map[string][]*Domain
+	json.Unmarshal(resBody, &result)
+	return result["domain"], nil
 }

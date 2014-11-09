@@ -24,7 +24,7 @@ func (c *Client) ListRecords(zone Domain) ([]Record, error) {
 	return parseRecordListResponse(res)
 }
 
-func (c *Client) AddRecord(auth *auth, zone Domain, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
+func (c *Client) AddRecord(zone Domain, name string, typ string, prio string, content string, ttl string) ([]Record, error) {
 	req, err := json.Marshal(map[string]string{"domain": zone.Name, "name": name, "type": typ, "prio": prio, "content": content, "ttl": ttl})
 	if err != nil {
 		return nil, err

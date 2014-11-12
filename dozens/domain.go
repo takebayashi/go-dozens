@@ -13,7 +13,7 @@ type Domain struct {
 }
 
 func (c *Client) ListDomains() ([]*Domain, error) {
-	req, err := c.newRequest("GET", "http://dozens.jp/api/zone.json", "")
+	req, err := c.newRequest("GET", apiRoot+"/zone.json", "")
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +38,7 @@ func (c *Client) AddDomain(domain *Domain, mail string) ([]*Domain, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := c.newRequest("POST", "http://dozens.jp/api/zone/create.json", string(reqBody))
+	req, err := c.newRequest("POST", apiRoot+"/zone/create.json", string(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *Client) AddDomain(domain *Domain, mail string) ([]*Domain, error) {
 }
 
 func (c *Client) DeleteDomain(domain *Domain) ([]*Domain, error) {
-	req, err := c.newRequest("DELETE", "http://dozens.jp/api/zone/delete/"+domain.Id+".json", "")
+	req, err := c.newRequest("DELETE", apiRoot+"/zone/delete/"+domain.Id+".json", "")
 	if err != nil {
 		return nil, err
 	}

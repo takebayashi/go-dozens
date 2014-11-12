@@ -17,7 +17,7 @@ type Record struct {
 }
 
 func (c *Client) ListRecords(zone *Domain) ([]*Record, error) {
-	req, err := c.newRequest("GET", "http://dozens.jp/api/record/"+zone.Name+".json", "")
+	req, err := c.newRequest("GET", apiRoot+"/record/"+zone.Name+".json", "")
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (c *Client) AddRecord(zone *Domain, record *Record) ([]*Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := c.newRequest("POST", "http://dozens.jp/api/record/create.json", string(reqBody))
+	req, err := c.newRequest("POST", apiRoot+"/record/create.json", string(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (c *Client) AddRecord(zone *Domain, record *Record) ([]*Record, error) {
 }
 
 func (c *Client) DeleteRecord(record *Record) ([]*Record, error) {
-	req, err := c.newRequest("DELETE", "http://dozens.jp/api/record/delete/"+record.Id+".json", "")
+	req, err := c.newRequest("DELETE", apiRoot+"/record/delete/"+record.Id+".json", "")
 	if err != nil {
 		return nil, err
 	}

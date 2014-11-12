@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+var apiRoot string = "http://dozens.jp/api"
+
 type Client struct {
 	httpClient *http.Client
 	auth       *auth

@@ -13,7 +13,7 @@ type auth struct {
 
 func GetToken(user string, key string) (*auth, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", "http://dozens.jp/api/authorize.json", nil)
+	req, err := http.NewRequest("POST", apiRoot+"/authorize.json", nil)
 	if err != nil {
 		return nil, err
 	}

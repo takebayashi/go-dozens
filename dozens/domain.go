@@ -81,5 +81,5 @@ func (c *Client) fetchDomain(req *http.Request, target *Domain) (*Domain, error)
 			return d, nil
 		}
 	}
-	return nil, nil
+	return nil, errors.New("domain not found")
 }

@@ -84,5 +84,5 @@ func (c *Client) fetchRecord(req *http.Request, target *Record) (*Record, error)
 			return e, nil
 		}
 	}
-	return nil, nil
+	return nil, errors.New("record not found")
 }

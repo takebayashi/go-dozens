@@ -13,7 +13,7 @@ type Client struct {
 }
 
 func NewClient(client *http.Client, user string, key string) (*Client, error) {
-	auth, err := GetToken(user, key)
+	auth, err := Auth(user, key)
 	if err != nil {
 		return nil, err
 	}

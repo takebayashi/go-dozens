@@ -11,7 +11,7 @@ type auth struct {
 	AuthToken string `json:"auth_token"`
 }
 
-func GetToken(user string, key string) (*auth, error) {
+func Auth(user string, key string) (*auth, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", apiRoot+"/authorize.json", nil)
 	if err != nil {

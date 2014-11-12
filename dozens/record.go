@@ -44,6 +44,18 @@ func (c *Client) DeleteRecord(record *Record) ([]*Record, error) {
 	return c.fetchRecordList(req)
 }
 
+func (c *Client) EditRecord(record *Record) ([]*Record, error) {
+	reqBody, err := json.Marshal(map[string]string{"prio": record.Prio, "content": record.Content, "ttl": record.Ttl})
+	if err != nil {
+		return nil, err
+	}
+	req, err := c.newRequest("POST", apiRoot+"/record/update/"+record.Id+".json", string(reqBody))
+	if err != nil {
+		return nil, err
+	}
+	return c.fetchRecordList(req)
+}
+
 func (c *Client) fetchRecordList(req *http.Request) ([]*Record, error) {
 	res, err := c.httpClient.Do(req)
 	if err != nil {

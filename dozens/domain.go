@@ -33,7 +33,7 @@ func (c *Client) GetDomain(name string) (*Domain, error) {
 	return nil, errors.New("Not Found")
 }
 
-func (c *Client) AddDomain(domain *Domain, mail string) ([]*Domain, error) {
+func (c *Client) AddDomain(domain *Domain, mail string) (*Domain, error) {
 	reqBody, err := json.Marshal(map[string]string{"name": domain.Name, "mailaddress": mail})
 	if err != nil {
 		return nil, err
@@ -42,15 +42,16 @@ func (c *Client) AddDomain(domain *Domain, mail string) ([]*Domain, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.fetchDomainList(req)
+	return c.fetchDomain(req, domain)
 }
 
-func (c *Client) DeleteDomain(domain *Domain) ([]*Domain, error) {
+func (c *Client) DeleteDomain(domain *Domain) error {
 	req, err := c.newRequest("DELETE", apiRoot+"/zone/delete/"+domain.Id+".json", "")
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return c.fetchDomainList(req)
+	_, err = c.fetchDomainList(req)
+	return err
 }
 
 func (c *Client) fetchDomainList(req *http.Request) ([]*Domain, error) {
@@ -68,4 +69,17 @@ func (c *Client) fetchDomainList(req *http.Request) ([]*Domain, error) {
 	var result map[string][]*Domain
 	json.Unmarshal(resBody, &result)
 	return result["domain"], nil
+}
+
+func (c *Client) fetchDomain(req *http.Request, target *Domain) (*Domain, error) {
+	list, err := c.fetchDomainList(req)
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range list {
+		if d.Name == target.Name {
+			return d, nil
+		}
+	}
+	return nil, nil
 }

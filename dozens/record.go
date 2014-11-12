@@ -24,7 +24,7 @@ func (c *Client) ListRecords(zone *Domain) ([]*Record, error) {
 	return c.fetchRecordList(req)
 }
 
-func (c *Client) AddRecord(zone *Domain, record *Record) ([]*Record, error) {
+func (c *Client) AddRecord(zone *Domain, record *Record) (*Record, error) {
 	reqBody, err := json.Marshal(map[string]string{"domain": zone.Name, "name": record.Name, "type": record.Type, "prio": record.Prio, "content": record.Content, "ttl": record.Ttl})
 	if err != nil {
 		return nil, err
@@ -33,18 +33,19 @@ func (c *Client) AddRecord(zone *Domain, record *Record) ([]*Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.fetchRecordList(req)
+	return c.fetchRecord(req, record)
 }
 
-func (c *Client) DeleteRecord(record *Record) ([]*Record, error) {
+func (c *Client) DeleteRecord(record *Record) error {
 	req, err := c.newRequest("DELETE", apiRoot+"/record/delete/"+record.Id+".json", "")
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return c.fetchRecordList(req)
+	_, err = c.fetchRecordList(req)
+	return err
 }
 
-func (c *Client) EditRecord(record *Record) ([]*Record, error) {
+func (c *Client) EditRecord(record *Record) (*Record, error) {
 	reqBody, err := json.Marshal(map[string]string{"prio": record.Prio, "content": record.Content, "ttl": record.Ttl})
 	if err != nil {
 		return nil, err
@@ -53,7 +54,7 @@ func (c *Client) EditRecord(record *Record) ([]*Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.fetchRecordList(req)
+	return c.fetchRecord(req, record)
 }
 
 func (c *Client) fetchRecordList(req *http.Request) ([]*Record, error) {
@@ -71,4 +72,17 @@ func (c *Client) fetchRecordList(req *http.Request) ([]*Record, error) {
 	var records map[string][]*Record
 	json.Unmarshal(resBody, &records)
 	return records["record"], nil
+}
+
+func (c *Client) fetchRecord(req *http.Request, target *Record) (*Record, error) {
+	list, err := c.fetchRecordList(req)
+	if err != nil {
+		return nil, err
+	}
+	for _, e := range list {
+		if e.Name == target.Name {
+			return e, nil
+		}
+	}
+	return nil, nil
 }

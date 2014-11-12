@@ -30,7 +30,7 @@ func main() {
 			return
 		}
 		for ri, r := range records {
-			fmt.Printf("\tRecord #%02d: %s %s %s\n", ri, r.Type, r.Name, r.Content)
+			fmt.Printf("\tRecord #%02d: %s %s %s\n", ri, r.Type, r.FQName, r.Content)
 		}
 	}
 }

@@ -9,7 +9,8 @@ import (
 
 type Record struct {
 	Id      string `json:"id"`
-	Name    string `json:"name"`
+	SName   string
+	FQName  string `json:"name"`
 	Type    string `json:"type"`
 	Prio    string `json:"prio"`
 	Content string `json:"content"`
@@ -24,8 +25,8 @@ func (c *Client) ListRecords(zone *Domain) ([]*Record, error) {
 	return c.fetchRecordList(req)
 }
 
-func (c *Client) AddRecord(zone *Domain, record *Record) (*Record, error) {
-	reqBody, err := json.Marshal(map[string]string{"domain": zone.Name, "name": record.Name, "type": record.Type, "prio": record.Prio, "content": record.Content, "ttl": record.Ttl})
+func (c *Client) AddRecord(domain *Domain, record *Record) (*Record, error) {
+	reqBody, err := json.Marshal(map[string]string{"domain": domain.Name, "name": record.SName, "type": record.Type, "prio": record.Prio, "content": record.Content, "ttl": record.Ttl})
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +34,7 @@ func (c *Client) AddRecord(zone *Domain, record *Record) (*Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.fetchRecord(req, record)
+	return c.fetchRecord(req, domain, record)
 }
 
 func (c *Client) DeleteRecord(record *Record) error {
@@ -54,7 +55,16 @@ func (c *Client) EditRecord(record *Record) (*Record, error) {
 	if err != nil {
 		return nil, err
 	}
-	return c.fetchRecord(req, record)
+	list, err := c.fetchRecordList(req)
+	if err != nil {
+		return nil, err
+	}
+	for _, e := range list {
+		if e.Id == record.Id {
+			return e, nil
+		}
+	}
+	return nil, errors.New("some error was occured at editting")
 }
 
 func (c *Client) fetchRecordList(req *http.Request) ([]*Record, error) {
@@ -74,13 +84,13 @@ func (c *Client) fetchRecordList(req *http.Request) ([]*Record, error) {
 	return records["record"], nil
 }
 
-func (c *Client) fetchRecord(req *http.Request, target *Record) (*Record, error) {
+func (c *Client) fetchRecord(req *http.Request, d *Domain, target *Record) (*Record, error) {
 	list, err := c.fetchRecordList(req)
 	if err != nil {
 		return nil, err
 	}
 	for _, e := range list {
-		if e.Name == target.Name {
+		if e.FQName == (target.SName+"."+d.Name) && e.Type == target.Type {
 			return e, nil
 		}
 	}

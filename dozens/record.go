@@ -89,8 +89,14 @@ func (c *Client) fetchRecord(req *http.Request, d *Domain, target *Record) (*Rec
 	if err != nil {
 		return nil, err
 	}
+
+	fqname := target.SName + "." + d.Name
+	if target.SName == "" {
+		fqname = d.Name
+	}
+
 	for _, e := range list {
-		if e.FQName == (target.SName+"."+d.Name) && e.Type == target.Type {
+		if e.FQName == fqname && e.Type == target.Type {
 			return e, nil
 		}
 	}

@@ -54,6 +54,18 @@ func (c *Client) DeleteDomain(domain *Domain) error {
 	return err
 }
 
+func (c *Client) UpdateDomain(domain *Domain, mail string) (*Domain, error) {
+	reqBody, err := json.Marshal(map[string]string{"mailaddress": mail})
+	if err != nil {
+		return nil, err
+	}
+	req, err := c.newRequest("POST", apiRoot+"/zone/update/"+domain.Id+".json", string(reqBody))
+	if err != nil {
+		return nil, err
+	}
+	return c.fetchDomain(req, domain)
+}
+
 func (c *Client) fetchDomainList(req *http.Request) ([]*Domain, error) {
 	res, err := c.httpClient.Do(req)
 	if err != nil {
